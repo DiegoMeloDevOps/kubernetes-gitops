@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: kubernetes-gitops-api
   namespace: dev
+  labels:
+    app: kubernetes-git-ops-api
 
 spec:
   replicas: 2
@@ -19,6 +21,47 @@ spec:
     spec:
       containers:
       - name: api
-        image: kubernetes-gitops-api:1.0.0
+      # essaa imagem que buildamos atraves do dockerfile
+      # é a imagem da aplicação python 
+        image: kubernetes-gitops-api:1.1.0
+        # mesma porta que a aplicação roda
         ports:
           - containerPort: 5000
+        # exportando a configuração das variaveis de ambiente do configmap
+        envFrom:
+          - configMapRef:
+             name: kubernetes-gitops-api-config
+        # vamos realizar um start check para saber se aplicação iniciou 
+        # startup é usado mais em aplicações mais pesadas que levam tempo,
+        # por mais que a minha aplicação seja leve está aqui para demonstrar uma boa prática de health checks
+        # é de suma importância que em aplicações mais pesadas o startup seje o primeiro healthCheck pois 
+        # precisamos da validação dele primeiro para os demais testes de liveness e readiness não nós dar um falso positivo
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          # após se falhar 12x sera considerado falha
+          failureThreshold: 12
+          periodSeconds: 5
+
+        # vamos realizar um ready check para saber se está pronto para receber requisição
+        readinessProbe:
+        # vamos fazer um requisição GET que irá retornar o status code 200 está pronto para receber requisição
+          httpGet:
+          # o caminho onde está configurado na api para verificarmos se está saúdavel
+            path: /health
+            port: 5000
+            # ira aguardar 5 segundos após o pod iniciar para verificar
+          initialDelaySeconds: 5
+          # e realizara o teste a cada 10 segundos
+          periodSeconds: 10
+        # semelhante ao readiness,porem este é um health check, uma prova de vida
+        # ele quer saber se o pod está vivo, não só pronto para receber requisição
+        livenessProbe:
+        # se ao fazermos uma requisição recebermos 3x algum status code http diferente de 200
+        # a aplicação precisa ser reiniciado pois não está saúdavel
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 15

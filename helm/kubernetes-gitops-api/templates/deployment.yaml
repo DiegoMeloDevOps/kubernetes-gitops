@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: kubernetes-gitops-api
+  labels:
+    app: kubernetes-gitops-api
+
+spec:
+  # Ele irá pegar o valor da quantidade de réplicas do arquivo values
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: kubernetes-gitops-api
+
+  template:
+    metadata:
+      labels:
+        app: kubernetes-gitops-api
+
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - containerPort: 5000
+
+          envFrom:
+            - configMapRef:
+                name: kubernetes-gitops-api-config
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            failureThreshold: 12
+            periodSeconds: 5
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 15

@@ -8,7 +8,7 @@ app = Flask(__name__)
 def home():
     return jsonify({
         "application": "kubernetes-gitops-api",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "environment": os.getenv("APP_ENV", "unknown")
     })
 

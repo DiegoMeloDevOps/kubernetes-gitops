@@ -1,0 +1,17 @@
+# os values servem para ao inves de deixarmos valores hardcoded 
+# modificamos ele aqui, e ao inves de ir no arquivo linha por linha
+# modificamos eles diretamente aqui para os valores que queremos
+
+replicaCount: 2
+
+image:
+  repository: kubernetes-gitops-api
+  tag: "1.1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+
+environment: dev

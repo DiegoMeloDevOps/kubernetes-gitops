@@ -1,0 +1,8 @@
+apiVersion: v2 
+name: kubernetes-gitops-api
+description: Helm chart for kubernetes GitOps API 
+type: application
+# versão do chart
+version: 0.1.0
+# versão da aplicação
+appVersion: "1.1.0"

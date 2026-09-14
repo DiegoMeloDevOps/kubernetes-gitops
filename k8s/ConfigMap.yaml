@@ -1,0 +1,12 @@
+apiVersion: v1 
+kind: ConfigMap 
+metadata:
+  name: kubernetes-gitops-api-config
+  namespace: dev
+
+# o configmap está exportando uma variavel para dentro do container
+# essa variavel é uma variavel de ambiente, que está sendo passada como valor para a aplicação python
+# ao rodarmos o curl: no endpoint / obtemos "environment":"dev" , pois agora está sendo passado a variavel 
+# de ambiente
+data:
+  APP_ENV: "dev"
