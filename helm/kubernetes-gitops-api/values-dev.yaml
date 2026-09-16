@@ -2,7 +2,7 @@
 # modificamos ele aqui, e ao inves de ir no arquivo linha por linha
 # modificamos eles diretamente aqui para os valores que queremos
 
-replicaCount: 3
+replicaCount: 2
 
 image:
   repository: kubernetes-gitops-api
