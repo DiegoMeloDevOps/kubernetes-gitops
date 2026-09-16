@@ -5,8 +5,8 @@
 replicaCount: 6
 
 image:
-  repository: kubernetes-gitops-api
-  tag: "1.1.0"
+  repository: diegomelodevops/kubernetes-gitops-api
+  tag: "1.2.0"
   pullPolicy: IfNotPresent
 
 service:
