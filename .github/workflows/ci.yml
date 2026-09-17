@@ -34,5 +34,17 @@ jobs:
         working-directory: ./app
         run: python -m py_compile app.py
 
+        # como o nome diz, está buildando a imagem docker
       - name: Build da imagem docker
         run: docker build -t kubernetes-gitops-api:1.2.0 ./app
+        # aqui estamos fazendo o login para que possamos fazer o push
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        # as credenciais ficam armazenadas nas secrets do github actions para
+        # não ficar hardcoded
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+        # iremos subir a imagem para o repositorio do docker hub
+      - name: Push da imagem para Docker Hub
+        run: docker push diegomelodevops/kubernetes-gitops-api:1.2.0
