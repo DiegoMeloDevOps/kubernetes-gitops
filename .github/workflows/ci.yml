@@ -5,20 +5,46 @@ on:
   push: 
     branches:
       - main
+    # ou quando houver mudança de tags que começem com V + versão
+    tags:
+    - "v*"
 
   pull_request:
     branches:
       - main
+
+  
+  
 
 # irá rodar a esteira de CI ( teste + build)
     
 jobs:
   test:
     runs-on: ubuntu-latest 
+
+    # criação da variavel para não ter que ficar repetindo o nome do repositorio
+    env:
+      REGISTRY_IMAGE: diegomelodevops/kubernetes-gitops-api
     
     steps:
       - name: Baixar o codigo
         uses: actions/checkout@v3
+
+        # este step valida o seguinte, se o workflow
+        # foi executado por uma tag ele remove o "v" e o numero da versão ex: 1.3.0
+        # se for um push normal na main ele ira gerar um sha, e com a build irá
+        # ter uma identificação propria
+      - name: Definir Versão da Imagem
+        id: version
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="sha-${GITHUB_SHA::7}"
+          fi
+
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "Versão definida: ${VERSION}"
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -36,7 +62,7 @@ jobs:
 
         # como o nome diz, está buildando a imagem docker
       - name: Build da imagem docker
-        run: docker build -t diegomelodevops/kubernetes-gitops-api:1.2.0 ./app
+        run: docker build -t ${{env.REGISTRY_IMAGE}}:${{env.VERSION }} ./app
         # aqui estamos fazendo o login para que possamos fazer o push
       - name: Login no Docker Hub
         uses: docker/login-action@v3
@@ -47,4 +73,4 @@ jobs:
           password: ${{secrets.DOCKERHUB_TOKEN}}
         # iremos subir a imagem para o repositorio do docker hub
       - name: Push da imagem para Docker Hub
-        run: docker push diegomelodevops/kubernetes-gitops-api:1.2.0
+        run: docker push ${{env.REGISTRY_IMAGE}}:${{env.VERSION}}
