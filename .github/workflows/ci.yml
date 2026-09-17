@@ -35,4 +35,4 @@ jobs:
         run: python -m py_compile app.py
 
       - name: Build da imagem docker
-        run: docker build -t kubernetes-gitops-api:1.2.0 .. .\app
+        run: docker build -t kubernetes-gitops-api:1.2.0 ./app
