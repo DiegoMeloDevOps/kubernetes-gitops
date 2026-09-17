@@ -1,5 +1,6 @@
 name: CI - Esteira de testes
 
+# ao ter um novo commit ou pull request na branch main 
 on: 
   push: 
     branches:
@@ -9,6 +10,7 @@ on:
     branches:
       - main
 
+# irá rodar a esteira de CI ( teste + build)
     
 jobs:
   test:
@@ -23,6 +25,7 @@ jobs:
         with:
           python-version: "3.12"
       
+      # usamos comando with para "configurações" e run para comandos
       - name: Instalar Dependencias
         working-directory: ./app
         run: pip install -r requirements.txt
@@ -30,3 +33,6 @@ jobs:
       - name: Testar Aplicação
         working-directory: ./app
         run: python -m py_compile app.py
+
+      - name: Build da imagem docker
+        run: docker build -t kubernetes-gitops-api:1.2.0 .\app
