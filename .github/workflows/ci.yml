@@ -36,7 +36,7 @@ jobs:
 
         # como o nome diz, está buildando a imagem docker
       - name: Build da imagem docker
-        run: docker build -t kubernetes-gitops-api:1.2.0 ./app
+        run: docker build -t diegomelodevops/kubernetes-gitops-api:1.2.0 ./app
         # aqui estamos fazendo o login para que possamos fazer o push
       - name: Login no Docker Hub
         uses: docker/login-action@v3
