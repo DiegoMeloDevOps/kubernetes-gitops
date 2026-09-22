@@ -53,7 +53,7 @@ jobs:
 
       - name: Build da imagem Docker
         run: docker build -t ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION }} ./app
-        
+
         # para fazer o publish da imagem precisamos logar no docker hub
       - name: Login no Docker Hub
         uses: docker/login-action@v3
@@ -65,5 +65,9 @@ jobs:
 
       - name: Push da imagem para o Docker Hub
         run: docker push ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION }}
+
+      - name: Verificar imagem publicada
+        run: |
+          docker pull ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION }}
 
 # esta esteira faz o publish da imagem no docker hub, testa + build + automação da versão da tag + e sobre pro docker hub
