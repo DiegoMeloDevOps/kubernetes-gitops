@@ -21,9 +21,20 @@ jobs:
         # aqui é aonde irá ser feito a automação da versão da imagem e 
         # retirar a letra v da tag para deixar ex "1.3.0" ao inves de ter o "v"
         # e quebrar o build da imagem docker
-      - name: Definir versão da imagem
+        # tambem ira impedir que seje publicado vbanana atraves da validação
+        # de major.minor.patch
+      - name: Validar e definir versão da imagem
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          TAG="${GITHUB_REF_NAME}"
+
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag inválida: $TAG"
+            echo "Use o formato vMAJOR.MINOR.PATCH, por exemplo: v1.5.0"
+            exit 1
+          fi
+
+          VERSION="${TAG#v}"
+
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "Versão definida: ${VERSION}"
 
