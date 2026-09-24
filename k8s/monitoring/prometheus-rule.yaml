@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: kubernetes-gitops-api-alerts
+  namespace: monitoring
+
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+    - name: kubernetes-gitops-api
+      rules:
+
+        - alert: KubernetesGitopsApiPodsUnavailable
+
+          expr: |
+            kube_deployment_spec_replicas{
+              namespace="gitops-dev",
+              deployment="kubernetes-gitops-api"
+            }
+            -
+            kube_deployment_status_replicas_available{
+              namespace="gitops-dev",
+              deployment="kubernetes-gitops-api"
+            }
+            > 0
+
+          for: 1m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: "Pods indisponíveis no namespace : gitops-dev da aplicação"
+            description: "A kubernetes-gitops-api possui menos Pods disponíveis do que o desejado no namespace gitops-dev."
