@@ -14,7 +14,7 @@ spec:
       rules:
 
         - alert: KubernetesGitopsApiPodsUnavailable
-
+      
           expr: |
             kube_deployment_spec_replicas{
               namespace="gitops-dev",
