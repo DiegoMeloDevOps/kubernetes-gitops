@@ -17,12 +17,12 @@ spec:
       
           expr: |
             kube_deployment_spec_replicas{
-              namespace="gitops-dev",
+              namespace=~"gitops-(dev|homolog|prod)",
               deployment="kubernetes-gitops-api"
             }
             -
             kube_deployment_status_replicas_available{
-              namespace="gitops-dev",
+              namespace=~"gitops-(dev|homolog|prod)",
               deployment="kubernetes-gitops-api"
             }
             > 0

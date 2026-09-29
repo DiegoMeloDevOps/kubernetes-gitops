@@ -1,0 +1,48 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+
+metadata:
+  name: slack-notifications
+  namespace: gitops-prod
+
+
+spec:
+# está indicando a rota de quem ira receber o alerta
+  route:
+    receiver: slack
+    # agrupando por nome do alerta e namespace
+    groupBy:
+      - alertname
+      - namespace
+    # ira esperar 10 segundos para enviar o alerta
+    # permitindo que alertas deste mesmo tipo sejam agrupados no valor de 10 segundos
+    groupWait: 10s
+    # espera 5 minutos para enviar o proximo alerta que seje algo novo ou releavante
+    # do tipo do alerta ou namespace
+    groupInterval: 5m
+    # caso o problema continuar ele ira abrir o alerta novamente em 4 horas
+    repeatInterval: 4h
+    # ele ira fazer o roteamento para o slack caso o alert name corresponda a " KubernetesGitopsApiPodsUnavailable"
+    # validamos isso atrraves do = do matchType
+    matchers:
+      - name: alertname
+        value: KubernetesGitopsApiPodsUnavailable
+        matchType: "="
+# quem irá receber a mensagem no caso o slack
+  receivers:
+    - name: slack
+      # as configurações do slack como o o valor do webhook
+      # no caso gerei uma secret que nao fica hardcoded
+      slackConfigs:
+        - apiURL:
+            name: slack-webhook
+            key: webhook-url
+          # caso o alerta seja resolvido enviar no canal a mensagem que foi resolvido
+          # com o nome do alerta,namespace,status e resumo
+          sendResolved: true
+          title: 'Alerta Kubernetes: {{ .CommonLabels.alertname }}'
+          text: >-
+            *Alerta:* {{ .CommonLabels.alertname }}
+            *Namespace:* {{ .CommonLabels.namespace }}
+            *Status:* {{ .Status }}
+            *Resumo:* {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}
