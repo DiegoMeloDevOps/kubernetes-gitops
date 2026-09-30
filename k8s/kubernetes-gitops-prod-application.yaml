@@ -1,0 +1,37 @@
+﻿apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: kubernetes-gitops-prod
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/DiegoMeloDevOps/kubernetes-gitops.git
+    targetRevision: main
+    path: helm/kubernetes-gitops-api
+    helm:
+      valueFiles:
+        - values-prod.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-prod
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: kubernetes-gitops-api
+      namespace: gitops-prod
+      jsonPointers:
+        - /spec/replicas
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - RespectIgnoreDifferences=true

@@ -1,0 +1,37 @@
+﻿apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: kubernetes-gitops-homolog
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/DiegoMeloDevOps/kubernetes-gitops.git
+    targetRevision: main
+    path: helm/kubernetes-gitops-api
+    helm:
+      valueFiles:
+        - values-homog.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-homolog
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: kubernetes-gitops-api
+      namespace: gitops-homolog
+      jsonPointers:
+        - /spec/replicas
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - RespectIgnoreDifferences=true
